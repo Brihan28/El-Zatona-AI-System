@@ -105,7 +105,76 @@ router.get("/me", auth, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+// =======================
+// ✏️ UPDATE PROFILE
+// =======================
+router.put("/profile", auth, async (req, res) => {
+  try {
+    const { name } = req.body;
 
+    if (!name || !name.trim()) {
+      return res.status(400).json({ msg: "Name is required" });
+    }
+
+    const user = await User.findById(req.user);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    user.name = name.trim();
+
+    await user.save();
+
+    res.json({
+      msg: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+// =======================
+// 🔒 CHANGE PASSWORD
+// =======================
+router.put("/change-password", auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+
+    if (!match) {
+      return res.status(400).json({
+        msg: "Current password is incorrect",
+      });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+
+    await user.save();
+
+    res.json({
+      msg: "Password changed successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      msg: "Server error",
+    });
+  }
+});
 // =======================
 // 🔑 FORGOT PASSWORD
 // =======================
@@ -115,7 +184,9 @@ router.post("/forgot-password", async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.json({
+  msg: "If an account exists, a reset email has been sent.",
+});
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");

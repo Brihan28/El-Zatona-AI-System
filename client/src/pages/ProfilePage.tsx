@@ -15,6 +15,10 @@ const ProfilePage = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [attempts, setAttempts] = useState<any[]>([]);
+  const [name, setName] = useState("");
+const [currentPassword, setCurrentPassword] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [loading, setLoading] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -37,6 +41,7 @@ const ProfilePage = () => {
       ]);
 
       setUser(userRes.data);
+      setName(userRes.data.name);
       setFiles(filesRes.data);
       setPlans(plansRes.data);
       setAttempts(attemptsRes.data);
@@ -114,7 +119,53 @@ const handleDelete = async () => {
     console.error(err);
   }
 };
+const headers = {
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+};
 
+const updateProfile = async () => {
+  try {
+    setLoading(true);
+
+    const res = await axios.put(
+      "http://localhost:5000/api/auth/profile",
+      { name },
+      { headers }
+    );
+
+    setUser(res.data.user);
+
+    alert("Profile updated successfully!");
+  } catch (err: any) {
+    alert(err.response?.data?.msg || "Failed to update profile");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const changePassword = async () => {
+  try {
+    setLoading(true);
+
+    await axios.put(
+      "http://localhost:5000/api/auth/change-password",
+      {
+        currentPassword,
+        newPassword,
+      },
+      { headers }
+    );
+
+    setCurrentPassword("");
+    setNewPassword("");
+
+    alert("Password changed successfully!");
+  } catch (err: any) {
+    alert(err.response?.data?.msg || "Failed to change password");
+  } finally {
+    setLoading(false);
+  }
+};
   if (!user) return <div>Loading...</div>;
 
   const initials = user.name
@@ -142,10 +193,47 @@ const handleDelete = async () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Input value={user.name} readOnly />
-            <Input value={user.email} readOnly />
-          </div>
+          <div className="space-y-4">
+  <Input
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+    placeholder="Your name"
+  />
+
+
+  <Button
+    onClick={updateProfile}
+    disabled={loading}
+    className="w-full"
+  >
+    Save Changes
+  </Button>
+
+  <hr />
+
+  <Input
+    type="password"
+    placeholder="Current Password"
+    value={currentPassword}
+    onChange={(e) => setCurrentPassword(e.target.value)}
+  />
+
+  <Input
+    type="password"
+    placeholder="New Password"
+    value={newPassword}
+    onChange={(e) => setNewPassword(e.target.value)}
+  />
+
+  <Button
+    variant="secondary"
+    onClick={changePassword}
+    disabled={loading}
+    className="w-full"
+  >
+    Change Password
+  </Button>
+</div>
         </Card>
 
         {/* FILES */}
