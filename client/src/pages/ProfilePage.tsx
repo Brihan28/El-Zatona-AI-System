@@ -142,6 +142,28 @@ const updateProfile = async () => {
     setLoading(false);
   }
 };
+const deleteAccount = async () => {
+  const confirmDelete = window.confirm(
+    "Are you sure? This will permanently delete your account and all your data."
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete("http://localhost:5000/api/auth/delete-account", {
+      headers,
+    });
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
+    alert("Account deleted successfully.");
+
+    window.location.href = "/";
+  } catch (err: any) {
+    alert(err.response?.data?.msg || "Failed to delete account.");
+  }
+};
 
 const changePassword = async () => {
   try {
@@ -233,6 +255,15 @@ const changePassword = async () => {
   >
     Change Password
   </Button>
+  <hr />
+
+<Button
+  variant="destructive"
+  className="w-full"
+  onClick={deleteAccount}
+>
+  Delete My Account
+</Button>
 </div>
         </Card>
 

@@ -30,9 +30,10 @@ const createStudyController = (studyService) => ({
   markDay: async (req, res) => {
     try {
       const updated = await studyService.markDay(
-        req.params.planId,
-        req.params.dayIndex
-      );
+  req.user,
+  req.params.planId,
+  req.params.dayIndex
+);
 
       res.json(updated);
     } catch (err) {
@@ -42,7 +43,7 @@ const createStudyController = (studyService) => ({
 
   deletePlan: async (req, res) => {
     try {
-      await studyService.deletePlan(req.params.planId);
+await studyService.deletePlan(req.user, req.params.planId);
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ error: err.message });

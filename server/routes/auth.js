@@ -7,6 +7,9 @@ const User = require("../models/User");
 const crypto = require("crypto");
 const auth = require("../middleware/auth");
 const nodemailer = require("nodemailer");
+const File = require("../models/File");
+const Attempt = require("../models/Attempt");
+const StudyPlan = require("../models/StudyPlan");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -248,5 +251,23 @@ router.post("/reset-password", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+// =======================
+// 🗑 DELETE ACCOUNT
+// =======================
+router.delete("/delete-account", auth, async (req, res) => {
+  try {
+    const userId = req.user;
 
+    await File.deleteMany({ user: userId });
+    await Attempt.deleteMany({ user: userId });
+    await StudyPlan.deleteMany({ user: userId });
+
+    await User.findByIdAndDelete(userId);
+
+    res.json({ msg: "Account deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 module.exports = router;

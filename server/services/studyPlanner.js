@@ -98,28 +98,35 @@ ${file.extractedText.slice(0, 3000)}
   // =======================
   // MARK DAY
   // =======================
-  const markDay = async (planId, index) => {
-    const plan = await StudyPlan.findOne({
+const markDay = async (userId, planId, index) => {
+  const plan = await StudyPlan.findOne({
     _id: planId,
-    user,
-});
-    if (!plan) throw new Error("Plan not found");
+    user: userId,
+  });
 
-    plan.progress[index].completed = true;
-    await plan.save();
+  if (!plan) throw new Error("Plan not found");
 
-    return plan;
-  };
+  plan.progress[index].completed = true;
+  await plan.save();
+
+  return plan;
+};
 
   // =======================
   // DELETE
   // =======================
-  const deletePlan = async (planId) => {
-    return await StudyPlan.findOne({
+const deletePlan = async (userId, planId) => {
+  const deleted = await StudyPlan.findOneAndDelete({
     _id: planId,
-    user,
-});
-  };
+    user: userId,
+  });
+
+  if (!deleted) {
+    throw new Error("Study plan not found");
+  }
+
+  return deleted;
+};
 
   return {
     createPlan,
