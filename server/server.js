@@ -24,6 +24,9 @@ const createQuizRoutes = require("./routes/quizRoutes");
 const createStudyRoutes = require("./routes/studyPlanRoutes");
 const createSummaryRoutes = require("./routes/summaryRoutes");
 const createFileRoutes = require("./routes/fileRoutes");
+const passport = require("passport");
+const session = require("express-session");
+require("./config/passport");
 
 // normal routes
 const authRoutes = require("./routes/auth");
@@ -46,8 +49,23 @@ connectDB();
 // =======================
 // MIDDLEWARE
 // =======================
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:8080",
+    credentials: true,
+  })
+);
 app.use(express.json());
+app.use(
+  session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // =======================
 // 🔥 DEPENDENCY INJECTION

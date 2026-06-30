@@ -5,7 +5,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Chrome } from "lucide-react";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -19,7 +19,9 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
-
+const handleGoogleRegister = () => {
+  window.location.href = "http://localhost:5000/api/auth/google";
+};
   // ✅ SUBMIT
   const handleRegister = async (e: any) => {
     e.preventDefault();
@@ -90,7 +92,27 @@ const RegisterPage = () => {
           {error && (
             <p className="text-red-500 text-sm mb-4">{error}</p>
           )}
+<Button
+  type="button"
+  variant="outline"
+  className="w-full mb-4"
+  onClick={handleGoogleRegister}
+>
+  <Chrome className="mr-2 h-4 w-4" />
+  Continue with Google
+</Button>
 
+<div className="relative mb-4">
+  <div className="absolute inset-0 flex items-center">
+    <span className="w-full border-t" />
+  </div>
+
+  <div className="relative flex justify-center text-xs uppercase">
+    <span className="bg-background px-2 text-muted-foreground">
+      Or continue with email
+    </span>
+  </div>
+</div>
           {/* FORM */}
           <form className="space-y-4" onSubmit={handleRegister}>
 

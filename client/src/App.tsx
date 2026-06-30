@@ -14,9 +14,9 @@ import StudyPlanPage from "./pages/StudyPlanPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";      
-
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import GoogleSuccess from "./pages/GoogleSuccess";
 const queryClient = new QueryClient();
 
 
@@ -43,6 +43,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/study-plan/:id" element={<StudyPlanPage />} />
+          <Route path="/google-success" element={<GoogleSuccess />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

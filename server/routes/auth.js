@@ -10,6 +10,7 @@ const nodemailer = require("nodemailer");
 const File = require("../models/File");
 const Attempt = require("../models/Attempt");
 const StudyPlan = require("../models/StudyPlan");
+const passport = require("passport");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -270,4 +271,38 @@ router.delete("/delete-account", auth, async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+// =======================
+// GOOGLE LOGIN
+// =======================
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+
+// =======================
+// GOOGLE CALLBACK
+// =======================
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "http://localhost:8080/login",
+  }),
+  async (req, res) => {
+    const token = jwt.sign(
+      {
+        id: req.user._id,
+        role: req.user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.redirect(
+      `http://localhost:8080/google-success?token=${token}`
+    );
+  }
+);
 module.exports = router;
