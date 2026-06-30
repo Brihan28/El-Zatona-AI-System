@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Chrome } from "lucide-react";
+import VerifyOTP from "@/components/VerifyOTP";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -17,40 +18,51 @@ const RegisterPage = () => {
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState("");
+  const [showOTP, setShowOTP] = useState(false);
+  
 const handleGoogleRegister = () => {
   window.location.href = "http://localhost:5000/api/auth/google";
 };
   // ✅ SUBMIT
   const handleRegister = async (e: any) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        {
-          name: `${first} ${last}`,
-          email,
-          password,
-        }
-      );
+  try {
+    const res = await axios.post(
+      "http://localhost:5000/api/auth/register",
+      {
+        name: `${first} ${last}`,
+        email,
+        password,
+      }
+    );
 
-      // ✅ SAVE TOKEN
-      localStorage.setItem("token", res.data.token);
 
-      console.log("Registered:", res.data);
+    // Go to OTP verification page
+    alert(res.data.msg);
+setShowOTP(true);
 
-      // ✅ REDIRECT
-      navigate("/dashboard");
-
-    } catch (err: any) {
-      console.error(err.response?.data || err.message);
-      setError(err.response?.data?.msg || "Registration failed");
-    }
-  };
-
+  } catch (err: any) {
+    console.error(err.response?.data || err.message);
+    setError(err.response?.data?.msg || "Registration failed");
+  }
+};
+if (showOTP) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <VerifyOTP
+        email={email}
+        endpoint="verify-register-otp"
+        onSuccess={(data) => {
+          localStorage.setItem("token", data.token);
+          navigate("/dashboard");
+        }}
+      />
+    </div>
+  );
+}
   return (
     <div className="min-h-screen bg-background flex">
 
