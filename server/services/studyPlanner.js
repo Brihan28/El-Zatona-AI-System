@@ -15,7 +15,7 @@ const createStudyService = (aiService) => {
     if (!file.extractedText) throw new Error("File has no extracted content");
 
     const lastAttempt = await Attempt.findOne({
-      user: userId, // ✅ FIX
+      user, // ✅ FIX
       file: fileId,
     }).sort({ createdAt: -1 });
 
@@ -73,7 +73,7 @@ ${file.extractedText.slice(0, 3000)}
     }));
 
     const saved = await StudyPlan.create({
-      user: userId, // ✅ FIX (CRITICAL)
+      user,
       file: fileId,
       weakTopics,
       examDate,
@@ -99,7 +99,10 @@ ${file.extractedText.slice(0, 3000)}
   // MARK DAY
   // =======================
   const markDay = async (planId, index) => {
-    const plan = await StudyPlan.findById(planId);
+    const plan = await StudyPlan.findOne({
+    _id: planId,
+    user,
+});
     if (!plan) throw new Error("Plan not found");
 
     plan.progress[index].completed = true;
@@ -112,7 +115,10 @@ ${file.extractedText.slice(0, 3000)}
   // DELETE
   // =======================
   const deletePlan = async (planId) => {
-    return await StudyPlan.findByIdAndDelete(planId);
+    return await StudyPlan.findOne({
+    _id: planId,
+    user,
+});
   };
 
   return {
