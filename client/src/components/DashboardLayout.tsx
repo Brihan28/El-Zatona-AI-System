@@ -1,5 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, Upload, FileText, HelpCircle, Calendar, User, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Upload,
+  FileText,
+  HelpCircle,
+  Calendar,
+} from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +19,10 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import UserMenu from "@/components/UserMenu";
+
 import { NavLink } from "@/components/NavLink";
+// import UserMenu from "@/components/UserMenu";   // <-- we'll create this next
 
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -21,7 +30,6 @@ const mainNav = [
   { title: "AI Summary", url: "/summary", icon: FileText },
   { title: "Quizzes", url: "/quiz", icon: HelpCircle },
   { title: "Study Plan", url: "/study-plan", icon: Calendar },
-  { title: "Profile", url: "/profile", icon: User },
 ];
 
 function AppSidebarContent() {
@@ -31,6 +39,7 @@ function AppSidebarContent() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        {/* Logo */}
         <div className="p-4 flex items-center gap-2">
           <img
             src="/LOGO.png"
@@ -45,15 +54,23 @@ function AppSidebarContent() {
           )}
         </div>
 
+        {/* Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
+
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-primary/10 text-primary font-medium">
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="hover:bg-muted/50"
+                      activeClassName="bg-primary/10 text-primary font-medium"
+                    >
                       <item.icon className="mr-2 h-4 w-4" />
+
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
@@ -62,25 +79,6 @@ function AppSidebarContent() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <div className="mt-auto p-4">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className={collapsed ? "justify-center px-0" : ""}
-              >
-                <Link
-                  to="/"
-                  className="flex items-center w-full text-muted-foreground hover:text-foreground"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {!collapsed && <span className="ml-2">Log out</span>}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </div>
       </SidebarContent>
     </Sidebar>
   );
@@ -92,20 +90,40 @@ interface DashboardLayoutProps {
   subtitle?: string;
 }
 
-const DashboardLayout = ({ children, title, subtitle }: DashboardLayoutProps) => {
+const DashboardLayout = ({
+  children,
+  title,
+  subtitle,
+}: DashboardLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebarContent />
+
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b border-border bg-card px-4 gap-4">
-            <SidebarTrigger />
-            <div>
-              <h1 className="font-heading text-lg font-semibold text-foreground">{title}</h1>
-              {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          {/* Top Navbar */}
+          <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+
+              <div>
+                <h1 className="font-heading text-lg font-semibold text-foreground">
+                  {title}
+                </h1>
+
+                {subtitle && (
+                  <p className="text-xs text-muted-foreground">
+                    {subtitle}
+                  </p>
+                )}
+              </div>
             </div>
+
+            {/* User Dropdown goes here */}
+            <UserMenu />
           </header>
-          <main className="flex-1 p-6 overflow-auto">
+
+          <main className="flex-1 overflow-auto p-6">
             {children}
           </main>
         </div>

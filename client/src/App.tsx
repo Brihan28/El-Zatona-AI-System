@@ -11,12 +11,13 @@ import UploadPage from "./pages/UploadPage";
 import SummaryPage from "./pages/SummaryPage";
 import QuizPage from "./pages/QuizPage";
 import StudyPlanPage from "./pages/StudyPlanPage";
-import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/AdminDashboard";      
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import GoogleSuccess from "./pages/GoogleSuccess";
+import DeactivateAccountPage from "./pages/DeactivateAccountPage";
 const queryClient = new QueryClient();
 
 
@@ -37,13 +38,14 @@ const App = () => (
           <Route path="/summary" element={<SummaryPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/study-plan" element={<StudyPlanPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/study-plan/:id" element={<StudyPlanPage />} />
           <Route path="/google-success" element={<GoogleSuccess />} />
+          <Route path="/deactivate-account" element={<DeactivateAccountPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

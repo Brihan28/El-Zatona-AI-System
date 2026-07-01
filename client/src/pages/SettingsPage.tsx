@@ -224,26 +224,6 @@ return (
         </div>
       </Card>
 
-      {/* DANGER ZONE */}
-      <Card className="border-red-300 p-6">
-        <h3 className="text-lg font-semibold text-red-600 mb-2">
-          Danger Zone
-        </h3>
-
-        <p className="text-sm text-muted-foreground mb-5">
-          Permanently delete your account and all your uploaded lectures,
-          quizzes, and study plans. This action cannot be undone.
-        </p>
-
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={deleteAccount}
-        >
-          Delete My Account
-        </Button>
-      </Card>
-
     </div>
   </DashboardLayout>
 );

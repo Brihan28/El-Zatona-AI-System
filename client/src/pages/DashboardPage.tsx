@@ -9,14 +9,13 @@ import {
   BookOpen,
   ClipboardCheck,
   CalendarDays,
-  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const DashboardPage = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
-  const [attempts, setAttempts] = useState<any[]>([]); // 🔥 NEW
+  const [attempts, setAttempts] = useState<any[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -225,14 +224,6 @@ const openPlan = (planId: string) => {
           <Badge>
             {a.score}/{a.total}
           </Badge>
-
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => handleDeleteAttempt(a._id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     ))}
@@ -261,14 +252,6 @@ const openPlan = (planId: string) => {
             {plan.plan.length} completed
           </p>
         </div>
-
-        <Button
-          variant="destructive"
-          size="icon"
-          onClick={() => handleDeletePlan(plan._id)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
       </div>
     ))}
   </div>

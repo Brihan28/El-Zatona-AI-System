@@ -20,9 +20,6 @@ const transporter = nodemailer.createTransport({
 });
 
 // =======================
-// 🔐 REGISTER
-// =======================
-// =======================
 // 🔐 REGISTER (SEND OTP)
 // =======================
 router.post("/register", async (req, res) => {

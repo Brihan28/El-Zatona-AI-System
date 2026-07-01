@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectTrigger,
@@ -15,8 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CheckCircle2 } from "lucide-react";
-
+import { CheckCircle2, Trash2 } from "lucide-react";
 const API = "http://localhost:5000";
 
 const StudyPlanPage = () => {
@@ -25,11 +25,11 @@ const StudyPlanPage = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [activePlan, setActivePlan] = useState<any>(null);
-
   const [selectedFile, setSelectedFile] = useState("");
   const [examDate, setExamDate] = useState("");
   const [hoursPerDay, setHoursPerDay] = useState(2);
-
+const [showModal, setShowModal] = useState(false);
+const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -107,6 +107,33 @@ const StudyPlanPage = () => {
       console.error(err);
     }
   };
+  const openDeleteModal = (id: string) => {
+  setSelectedId(id);
+  setShowModal(true);
+};
+
+const handleDelete = async () => {
+  if (!selectedId) return;
+
+  try {
+    await axios.delete(`${API}/api/study/${selectedId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    setPlans((prev) => prev.filter((p) => p._id !== selectedId));
+
+    if (activePlan?._id === selectedId) {
+      setActivePlan(null);
+    }
+
+    setShowModal(false);
+    setSelectedId(null);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // ✅ ACTIVE PLAN VIEW
   if (activePlan) {
@@ -117,7 +144,19 @@ const StudyPlanPage = () => {
 
     return (
       <DashboardLayout title="Study Plan" subtitle="Your active plan">
-        <Button onClick={() => setActivePlan(null)}>← Back</Button>
+        <Button onClick={() => setActivePlan(null)}>← Back</Button><div className="flex justify-between items-center">
+  <Button onClick={() => setActivePlan(null)}>
+    ← Back
+  </Button>
+
+  <Button
+    variant="destructive"
+    onClick={() => openDeleteModal(activePlan._id)}
+  >
+    <Trash2 className="mr-2 h-4 w-4" />
+    Delete Plan
+  </Button>
+</div>
 
         <Card className="p-6 mt-4">
           <Progress value={progress} />
@@ -191,18 +230,61 @@ const StudyPlanPage = () => {
 
             return (
               <div
-                key={plan._id}
-                onClick={() => setActivePlan(plan)}
-                className="p-3 mt-3 border rounded cursor-pointer flex justify-between"
-              >
-                <span>Plan {i + 1}</span>
-                <span>{progress.toFixed(0)}%</span>
-              </div>
+  key={plan._id}
+  className="p-3 mt-3 border rounded flex justify-between items-center"
+>
+  <div
+    className="cursor-pointer flex-1"
+    onClick={() => setActivePlan(plan)}
+  >
+    <p>Plan {i + 1}</p>
+    <p className="text-xs text-muted-foreground">
+      {progress.toFixed(0)}% completed
+    </p>
+  </div>
+
+  <Button
+    variant="destructive"
+    size="icon"
+    onClick={() => openDeleteModal(plan._id)}
+  >
+    <Trash2 className="h-4 w-4" />
+  </Button>
+</div>
             );
           })}
         </Card>
 
       </div>
+      {showModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg w-[300px] text-center">
+      <h3 className="font-bold mb-2">
+        Delete Study Plan?
+      </h3>
+
+      <p className="text-sm mb-4">
+        This action cannot be undone.
+      </p>
+
+      <div className="flex justify-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          variant="destructive"
+          onClick={handleDelete}
+        >
+          Delete
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
     </DashboardLayout>
   );
 };
