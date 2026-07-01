@@ -16,8 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CheckCircle2, XCircle, Send } from "lucide-react";
-
+import { CheckCircle2, XCircle, Send, Trash2 } from "lucide-react";
 interface Question {
   question: string;
   options?: string[];
@@ -38,7 +37,8 @@ const QuizPage = () => {
   // 🔥 HISTORY
   const [attempts, setAttempts] = useState<any[]>([]);
   const [activeAttempt, setActiveAttempt] = useState<any>(null);
-
+const [showModal, setShowModal] = useState(false);
+const [selectedId, setSelectedId] = useState<string | null>(null);
   // =========================
   // 📂 FETCH
   // =========================
@@ -75,6 +75,35 @@ useEffect(() => {
     });
     setAttempts(res.data);
   };
+
+  const openDeleteModal = (id: string) => {
+  setSelectedId(id);
+  setShowModal(true);
+};
+
+const handleDelete = async () => {
+  if (!selectedId) return;
+
+  try {
+    await axios.delete(
+      `http://localhost:5000/api/attempts/${selectedId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    setAttempts((prev) =>
+      prev.filter((a) => a._id !== selectedId)
+    );
+
+    setShowModal(false);
+    setSelectedId(null);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   // =========================
   // 🎯 GENERATE
@@ -313,27 +342,66 @@ const generateQuiz = async () => {
         <Card className="p-6">
           <h3 className="mb-4">Your Attempts</h3>
 
-          {attempts.map((a, i) => (
-            <div
-              key={i}
-              onClick={() => setActiveAttempt(a)}
-              className="p-3 mb-3 border rounded-lg cursor-pointer flex justify-between hover:bg-muted"
-            >
-              <div>
-                <p>{a.file?.filename || "Quiz"}</p>
-                <p className="text-xs">
-                  {new Date(a.createdAt).toDateString()}
-                </p>
-              </div>
+          {attempts.map((a) => (
+  <div
+    key={a._id}
+    className="flex justify-between items-center p-3 mb-3 border rounded-lg hover:bg-muted"
+  >
+    <div
+      className="cursor-pointer flex-1"
+      onClick={() => setActiveAttempt(a)}
+    >
+      <p>{a.file?.filename || "Quiz"}</p>
+      <p className="text-xs">
+        {new Date(a.createdAt).toDateString()}
+      </p>
+    </div>
 
-              <Badge>
-                {a.score}/{a.total}
-              </Badge>
-            </div>
-          ))}
+    <div className="flex items-center gap-2">
+      <Badge>
+        {a.score}/{a.total}
+      </Badge>
+
+      <Button
+        size="icon"
+        variant="destructive"
+        onClick={() => openDeleteModal(a._id)}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  </div>
+))}
         </Card>
 
       </div>
+      {showModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg w-[300px] text-center">
+      <h3 className="font-bold mb-2">Delete Attempt?</h3>
+
+      <p className="text-sm mb-4">
+        This action cannot be undone.
+      </p>
+
+      <div className="flex justify-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          variant="destructive"
+          onClick={handleDelete}
+        >
+          Delete
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
     </DashboardLayout>
   );
 };

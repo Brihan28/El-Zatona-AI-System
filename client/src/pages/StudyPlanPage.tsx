@@ -173,7 +173,7 @@ const StudyPlanPage = () => {
           </Select>
 
           <Input type="date" onChange={(e) => setExamDate(e.target.value)} />
-          <Input type="number" onChange={(e) => setHoursPerDay(Number(e.target.value))} />
+          <Input placeholder="Hours per day" type="number" onChange={(e) => setHoursPerDay(Number(e.target.value))} />
 
           <Button onClick={generatePlan}>
             {loading ? "Generating..." : "Generate Plan"}

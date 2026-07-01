@@ -38,17 +38,42 @@ const createStudyService = (aiService) => {
       Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     );
 
-    const prompt = `
-Return ONLY valid JSON array.
+const prompt = `
+You are an expert academic study planner.
 
-STRICT RULES:
-- ONLY JSON
-- Generate EXACTLY ${totalDays} days
-- Each day MUST have EXACTLY ${hoursPerDay} tasks
-- Each task MUST be 1h
-- Focus ONLY on: ${weakTopics.join(", ")}
+Your task is to create a realistic and balanced study schedule based ONLY on the provided lecture content and the student's weak topics.
 
-CONTENT:
+IMPORTANT RULES:
+- Return ONLY a valid JSON array.
+- Do NOT include markdown.
+- Do NOT include explanations.
+- Do NOT wrap the JSON inside \`\`\`.
+- Generate EXACTLY ${totalDays} study days.
+- Each day MUST contain EXACTLY ${hoursPerDay} study tasks.
+- Assume each task represents approximately one hour of study.
+- Focus primarily on these weak topics:
+${weakTopics.join(", ")}
+- If there is remaining time, include revision of important concepts from the lecture.
+- Distribute the workload evenly across all days.
+- Avoid repeating the exact same task unless necessary.
+- Begin with foundational concepts before advanced ones.
+- Reserve the final day for comprehensive revision and self-testing.
+- Use concise, actionable task descriptions.
+
+Return the JSON in this exact format:
+
+[
+  {
+    "day": "Day 1",
+    "tasks": [
+      "Study Topic A",
+      "Practice Topic A",
+      "Review Topic B"
+    ]
+  }
+]
+
+LECTURE CONTENT:
 ${file.extractedText.slice(0, 3000)}
 `;
 
@@ -104,10 +129,21 @@ const markDay = async (userId, planId, index) => {
     user: userId,
   });
 
-  if (!plan) throw new Error("Plan not found");
+  if (!plan) {
+    throw new Error("Plan not found");
+  }
 
-  plan.progress[index].completed = true;
-  await plan.save();
+  if (index < 0 || index >= plan.progress.length) {
+    throw new Error("Invalid day index");
+  }
+
+plan.progress[index].completed = !plan.progress[index].completed;
+
+plan.markModified("progress");
+
+await plan.save();
+
+return await StudyPlan.findById(planId);
 
   return plan;
 };
